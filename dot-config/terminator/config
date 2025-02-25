@@ -1,0 +1,19 @@
+[global_config]
+[keybindings]
+  broadcast_off = <Alt>o
+  broadcast_all = <Alt>a
+[profiles]
+  [[default]]
+    background_darkness = 0.86
+    background_type = transparent
+    font = JetBrainsMonoNL Nerd Font Propo Bold 13
+    use_system_font = False
+[layouts]
+  [[default]]
+    [[[window0]]]
+      type = Window
+      parent = ""
+    [[[child1]]]
+      type = Terminal
+      parent = window0
+[plugins]
