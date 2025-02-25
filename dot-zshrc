@@ -104,9 +104,9 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 
 
     # naoqi SDK
-    # export PYTHONPATH="$HOME/Projects/nao/nao_chat/nao_docker/naoqi_choregraphe/naoqi_SDK/pynaoqi-python2.7-2.8.6.23-linux64-20191127_152327/lib/python2.7/site-packages:$PYTHONPATH"
-    # export QI_SDK_PREFIX="$HOME/Projects/nao/nao_chat/nao_docker/naoqi_choregraphe/naoqi_SDK/pynaoqi-python2.7-2.8.6.23-linux64-20191127_152327:$QI_SDK_PREFIX"
-    # export LD_LIBRARY_PATH="$HOME/Projects/nao/nao_chat/nao_docker/naoqi_choregraphe/naoqi_SDK/pynaoqi-python2.7-2.8.6.23-linux64-20191127_152327:$LD_LIBRARY_PATH"
+    # export PYTHONPATH="$HOME/project/nao/nao_chat/nao_docker/naoqi_choregraphe/naoqi_SDK/pynaoqi-python2.7-2.8.6.23-linux64-20191127_152327/lib/python2.7/site-packages:$PYTHONPATH"
+    # export QI_SDK_PREFIX="$HOME/project/nao/nao_chat/nao_docker/naoqi_choregraphe/naoqi_SDK/pynaoqi-python2.7-2.8.6.23-linux64-20191127_152327:$QI_SDK_PREFIX"
+    # export LD_LIBRARY_PATH="$HOME/project/nao/nao_chat/nao_docker/naoqi_choregraphe/naoqi_SDK/pynaoqi-python2.7-2.8.6.23-linux64-20191127_152327:$LD_LIBRARY_PATH"
 
     source /opt/ros/jazzy/setup.zsh
 else
