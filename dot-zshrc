@@ -1,0 +1,117 @@
+# set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/bin" ] ; then
+    PATH="$HOME/bin:$PATH"
+fi
+
+# set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/.local/bin" ] ; then
+    PATH="$HOME/.local/bin:$PATH"
+fi
+
+# Homebrew init
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+else
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
+# source zsh plugin
+source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# source p10k theme
+source $(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.config/p10k/p10k.zsh ]] || source ~/.config/p10k/p10k.zsh
+
+# vi
+bindkey -v
+
+# # Lines configured by zsh-newuser-install
+# HISTFILE=~/.histfile
+# HISTSIZE=1000
+# SAVEHIST=1000
+
+
+# # End of lines configured by zsh-newuser-install
+# # The following lines were added by compinstall
+# zstyle :compinstall filename '$HOME/.zshrc'
+
+# autoload -Uz compinit
+# compinit
+# # End of lines added by compinstall
+
+# Alias
+alias ls='lsd -F --group-directories-first'
+alias la='ls -AF --group-directories-first'
+alias man='tldr'
+alias lg='lazygit'
+alias ld='lazydocker'
+alias t='todo.sh'
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+# __conda_setup="$('$HOME/miniforge3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+# if [ $? -eq 0 ]; then
+#     eval "$__conda_setup"
+# else
+#     if [ -f "$HOME/miniforge3/etc/profile.d/conda.sh" ]; then
+#         . "$HOME/miniforge3/etc/profile.d/conda.sh"
+#     else
+#         export PATH="$HOME/miniforge3/bin:$PATH"
+#     fi
+# fi
+# unset __conda_setup
+# <<< conda initialize <<<
+
+# !!!! NEW CONDA INITIALIZE !!!!
+
+# Define the function to initialize Conda
+conda_function() {
+    # Unset existing conda alias if it exists
+    unalias conda 2>/dev/null
+    __conda_setup="$('$HOME/miniforge3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+    if [ $? -eq 0 ]; then
+        eval "$__conda_setup"
+    else
+        echo "Conda setup failed. Falling back to static configuration."
+        if [ -f "$HOME/miniforge3/etc/profile.d/conda.sh" ]; then
+            . "$HOME/miniforge3/etc/profile.d/conda.sh"
+        else
+            export PATH="$HOME/miniforge3/bin:$PATH"
+        fi
+    fi
+    unset __conda_setup
+
+    if [ -f "$HOME/miniforge3/etc/profile.d/mamba.sh" ]; then
+        . "$HOME/miniforge3/etc/profile.d/mamba.sh"
+    fi
+}
+
+# Set up aliases for convenience
+alias conda="conda_function"
+
+# OpenAI Key
+export OPENAI_API_KEY=$(cat "$HOME/Documents/key.txt")
+
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    # export GIT_ENV=rog16
+
+    # mujoco-py installation
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/.mujoco/mujoco210/bin
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia
+
+
+    # naoqi SDK
+    # export PYTHONPATH="$HOME/Projects/nao/nao_chat/nao_docker/naoqi_choregraphe/naoqi_SDK/pynaoqi-python2.7-2.8.6.23-linux64-20191127_152327/lib/python2.7/site-packages:$PYTHONPATH"
+    # export QI_SDK_PREFIX="$HOME/Projects/nao/nao_chat/nao_docker/naoqi_choregraphe/naoqi_SDK/pynaoqi-python2.7-2.8.6.23-linux64-20191127_152327:$QI_SDK_PREFIX"
+    # export LD_LIBRARY_PATH="$HOME/Projects/nao/nao_chat/nao_docker/naoqi_choregraphe/naoqi_SDK/pynaoqi-python2.7-2.8.6.23-linux64-20191127_152327:$LD_LIBRARY_PATH"
+
+    source /opt/ros/jazzy/setup.zsh
+else
+    # export GIT_ENV=m2pro
+
+    # source "$HOME/.wasmedge/env"
+    # . "$HOME/.cargo/env"
+fi
