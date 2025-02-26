@@ -111,7 +111,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     source /opt/ros/jazzy/setup.zsh
 else
     # export GIT_ENV=m2pro
-
+    . $(brew --prefix)/etc/profile.d/autojump.sh
     # source "$HOME/.wasmedge/env"
     # . "$HOME/.cargo/env"
 fi

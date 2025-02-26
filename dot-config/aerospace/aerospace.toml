@@ -40,8 +40,8 @@ default-root-container-orientation = 'auto'
 # See https://nikitabobko.github.io/AeroSpace/guide#on-focus-changed-callbacks
 # See https://nikitabobko.github.io/AeroSpace/commands#move-mouse
 # Fallback value (if you omit the key): on-focused-monitor-changed = []
-# on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
-on-focus-changed = ['move-mouse window-lazy-center']
+on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+# on-focus-changed = ['move-mouse window-lazy-center']
 
 # You can effectively turn off macOS "Hide application" (cmd-h) feature by toggling this flag
 # Useful if you don't use this macOS feature, but accidentally hit cmd-h or cmd-alt-h key
@@ -174,10 +174,9 @@ alt-shift-l = ['join-with right', 'mode main']
 
 # Windows Callback
 [[on-window-detected]]
-  if.app-id = 'com.microsoft.VSCode'
-  run = 'move-node-to-workspace w'   # mnemonics w - workspace
+if.app-id = 'com.microsoft.VSCode'
+run = 'move-node-to-workspace w'   # mnemonics w - workspace
 
 [[on-window-detected]]
-  if.app-id = 'com.googlecode.iterm2'
-  run = 'move-node-to-workspace t'  # mnemonics t - Terminal
-
+if.app-id = 'com.googlecode.iterm2'
+run = 'move-node-to-workspace t'    # mnemonics t - Terminal
