@@ -130,6 +130,7 @@ alt-8 = 'workspace 8'
 alt-9 = 'workspace 9'
 alt-t = 'workspace t'
 alt-w = 'workspace w'
+alt-o = 'workspace o'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
 alt-shift-1 = 'move-node-to-workspace 1'
@@ -180,3 +181,8 @@ run = 'move-node-to-workspace w'   # mnemonics w - workspace
 [[on-window-detected]]
 if.app-id = 'com.googlecode.iterm2'
 run = 'move-node-to-workspace t'    # mnemonics t - Terminal
+
+[[on-window-detected]]
+if.app-id = 'md.obsidian'
+run = 'move-node-to-workspace o' # mnemonics t - Terminal
+

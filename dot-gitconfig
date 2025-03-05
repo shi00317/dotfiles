@@ -10,3 +10,5 @@
 	clean = git-lfs clean -- %f
 [init]
 	defaultBranch = main
+[core]
+	excludesfile = ~/.gitignore_global

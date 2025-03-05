@@ -75,7 +75,7 @@ conda_function() {
     if [ $? -eq 0 ]; then
         eval "$__conda_setup"
     else
-        echo "Conda setup failed. Falling back to static configuration."
+        # echo "Conda setup failed. Falling back to static configuration."
         if [ -f "$HOME/miniforge3/etc/profile.d/conda.sh" ]; then
             . "$HOME/miniforge3/etc/profile.d/conda.sh"
         else
