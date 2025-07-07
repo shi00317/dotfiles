@@ -197,3 +197,7 @@ run = 'move-node-to-workspace t'    # mnemonics t - Terminal
 [[on-window-detected]]
 if.app-id = 'md.obsidian'
 run = 'move-node-to-workspace o' # mnemonics t - Terminal
+
+[[on-window-detected]]
+if.app-id = 'com.todesktop.230313mzl4w4u92'
+run = 'move-node-to-workspace w'

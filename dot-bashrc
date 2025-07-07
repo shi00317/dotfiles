@@ -1,7 +1,3 @@
-# ~/.bashrc: executed by bash(1) for non-login shells.
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
-# for examples
-
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
 __conda_setup="$('/home/shi00317/miniforge3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
@@ -16,10 +12,6 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
-
-# export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/haoyi/Documents/miniconda3/envs/nao_chat/lib/python3.8/site-packages/nvidia/cudnn/lib
-# export LD_LIBRARY_PATH=/home/shi00317/miniforge3/envs/nao_chat/lib/python3.9/site-packages/torch/lib:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=/home/shi00317/miniforge3/envs/nao_chat/lib/python3.8/site-packages/nvidia/cudnn/lib:$LD_LIBRARY_PATH
 
 # naoqi SDK
 # export PYTHONPATH="/home/shi00317/project/nao/nao_chat/nao_docker/naoqi_choregraphe/naoqi_SDK/pynaoqi-python2.7-2.8.6.23-linux64-20191127_152327/lib/python2.7/site-packages:$PYTHONPATH"
