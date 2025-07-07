@@ -105,6 +105,12 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 
     ROS_DIR=$(ls /opt/ros | sort -Vr | head -n 1)
     source /opt/ros/$ROS_DIR/setup.zsh
+
+    # naoqi SDK
+    # export PYTHONPATH="/home/shi00317/project/nao/nao_chat/nao_docker/naoqi_choregraphe/naoqi_SDK/pynaoqi-python2.7-2.8.6.23-linux64-20191127_152327/lib/python2.7/site-packages:$PYTHONPATH"
+    # export QI_SDK_PREFIX="/home/shi00317/project/nao/nao_chat/nao_docker/naoqi_choregraphe/naoqi_SDK/pynaoqi-python2.7-2.8.6.23-linux64-20191127_152327:$QI_SDK_PREFIX"
+    # export LD_LIBRARY_PATH="/home/shi00317/project/nao/nao_chat/nao_docker/naoqi_choregraphe/naoqi_SDK/pynaoqi-python2.7-2.8.6.23-linux64-20191127_152327:$LD_LIBRARY_PATH"
+
 fi
 
 . $(brew --prefix)/etc/profile.d/autojump.sh

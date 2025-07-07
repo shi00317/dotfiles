@@ -1,7 +1,7 @@
 \.git
 \.gitignore
 \.gitmodules
-\iterm2
+^iterm2$
 
 ^/README.*
 ^/LICENSE.*
