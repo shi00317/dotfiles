@@ -11,7 +11,7 @@ tmux
 tldr
 zsh-autosuggestions
 zsh-syntax-highlighting
-zsh-autocomplete
+zsh-vi-mode
 lua
 nvim
 fd
