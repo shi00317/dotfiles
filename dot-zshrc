@@ -15,6 +15,105 @@ else
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
 
+# ZSH Prompt config
+# ------------------
+
+# Required for vcs_info
+autoload -Uz vcs_info
+setopt PROMPT_SUBST
+
+# --- Nerd Font Icons ---
+# Make sure you have a Nerd Font installed and enabled in your terminal.
+# You can change these icons to any other you prefer from your Nerd Font.
+local folder_icon="" # U+F07C
+local git_icon=""   # U+F126
+
+# --- Git Status Hook ---
+# This custom function will be called by vcs_info. It checks the Git repository's
+# status and assigns a "state" (e.g., clean, dirty, ahead). This state is then
+# used by 'actionformats' to apply different colors and symbols.
++vi-git-action() {
+    # Check if a remote tracking branch is configured
+    local remote
+    remote="$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null)"
+
+    # Check for uncommitted changes (staged or unstaged)
+    if ! git diff --quiet --ignore-submodules HEAD; then
+        # If there are changes, mark state as 'dirty'
+        hook_com[action]='dirty'
+        return
+    fi
+
+    # If there's no remote, we can't be ahead or behind
+    if [[ -z "$remote" ]]; then
+        hook_com[action]='clean'
+        return
+    fi
+
+    # Get the count of commits ahead/behind the remote
+    local -a ahead_behind
+    ahead_behind=($(git rev-list --left-right --count $remote...HEAD))
+    local behind=${ahead_behind[1]}
+    local ahead=${ahead_behind[2]}
+
+    # Set the state based on the ahead/behind status
+    if [[ $ahead -gt 0 && $behind -gt 0 ]]; then
+        hook_com[action]='diverged'
+    elif [[ $ahead -gt 0 ]]; then
+        hook_com[action]='ahead'
+    elif [[ $behind -gt 0 ]]; then
+        hook_com[action]='behind'
+    else
+        # If none of the above, the repo is clean relative to the remote
+        hook_com[action]='clean'
+    fi
+}
+
+# --- VCS Styling ---
+# Add our custom function to the vcs_info 'hooks'
+zstyle ':vcs_info:git:*' hooks git-action
+
+# Enable checking for staged/unstaged changes. The 'S' and 'U' will appear next to the branch name.
+zstyle ':vcs_info:*' check-for-changes true
+# Adjusted yellow for staged/unstaged changes to a softer tone (e.g., color 3, which is yellow, or a specific hex code if your terminal supports it)
+zstyle ':vcs_info:git:*' stagedstr "%F{#ebdf86} S%f"   # 'S' for Staged - using default yellow for visibility
+zstyle ':vcs_info:git:*' unstagedstr "%F{#ebdf86} U%f" # 'U' for Unstaged - using default yellow for visibility
+
+# Define the format for each state. vcs_info will automatically select the
+# correct format based on the 'action' we set in the hook function.
+#
+#   - %b: branch name
+#   - %c: staged changes indicator (from stagedstr)
+#   - %u: unstaged changes indicator (from unstagedstr)
+
+zstyle ':vcs_info:git:clean:*'      actionformats "%F{#92d4a5}${git_icon} %b%c%u%f"   # Using default 'green' (color 2)
+zstyle ':vcs_info:git:dirty:*'      actionformats "%F{#ebdf86}${git_icon} %b%c%u%f"  # Using default 'yellow' (color 3)
+zstyle ':vcs_info:git:ahead:*'      actionformats "%F{#66d4f2}${git_icon} %b%c%u ↑%f"  # Using default 'cyan' (color 6)
+zstyle ':vcs_info:git:behind:*'     actionformats "%F{#66d4f2}${git_icon} %b%c%u ↓%f"  # Using default 'cyan' (color 6)
+zstyle ':vcs_info:git:diverged:*'   actionformats "%F{#f07373}${git_icon} %b%c%u ↕%f"    # Using default 'red' (color 1)
+
+# Fallback format if no remote is configured
+zstyle ':vcs_info:git:*' formats "%F{#92d4a5}${git_icon} %b%c%u%f" # Using default 'green' (color 2)
+
+# --- Prompt Assembly ---
+# The precmd function is executed before each prompt is displayed.
+precmd() {
+    vcs_info
+}
+
+# The final PROMPT string.
+#   - %F{color}: Sets the foreground color
+#   - %f: Resets the foreground color
+#   - ${folder_icon}: Displays the folder icon.
+#   - %~: Displays the path, with ~ for the home directory.
+#   - ${vcs_info_msg_0_}: This is where our styled Git information will be inserted.
+#   - \n: Creates a new line.
+#   - └─: The "curve" indicator.
+#   - %F{#92d4a5}❯%f: Green arrow indicator.
+#   - %_: Moves the cursor to the next line for user input (after the arrow and space).
+PROMPT='%F{#c7c3f7}╭─%f %F{#fcd860}${folder_icon} %~%f ${vcs_info_msg_0_}
+%F{#c7c3f7}└─%f %F{#92d4a5}❯%f '
+
 # source zsh plugin
 source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
