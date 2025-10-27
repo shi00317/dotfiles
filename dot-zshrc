@@ -210,5 +210,3 @@ export DYLD_LIBRARY_PATH=$(brew --prefix libomp)/lib:$DYLD_LIBRARY_PATH
 . $(brew --prefix)/etc/profile.d/autojump.sh
 # source "$HOME/.wasmedge/env"
 # . "$HOME/.cargo/env"
-
-t ls
