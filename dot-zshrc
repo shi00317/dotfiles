@@ -111,14 +111,15 @@ precmd() {
 #   - └─: The "curve" indicator.
 #   - %F{#92d4a5}❯%f: Green arrow indicator.
 #   - %_: Moves the cursor to the next line for user input (after the arrow and space).
-PROMPT='%F{#c7c3f7}╭─%f %F{#fcd860}${folder_icon} %~%f ${vcs_info_msg_0_}
-%F{#c7c3f7}└─%f %F{#92d4a5}❯%f '
+PROMPT='%F{#fcd860}${folder_icon} %~%f ${vcs_info_msg_0_}
+%F{#92d4a5}❯%f '
 
 # source zsh plugin
 source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source $(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
 ZVM_VI_INSERT_ESCAPE_BINDKEY=jk
+
 # vi
 bindkey -v
 
@@ -142,8 +143,6 @@ alias la='ls -AF --group-directories-first'
 alias man='tldr'
 alias lg='lazygit'
 alias ld='lazydocker'
-alias t='todo.sh -d ~/.config/todo/todo.cfg -c'
-
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
@@ -206,8 +205,10 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     # export LD_LIBRARY_PATH="/home/shi00317/project/nao/nao_chat/nao_docker/naoqi_choregraphe/naoqi_SDK/pynaoqi-python2.7-2.8.6.23-linux64-20191127_152327:$LD_LIBRARY_PATH"
 
 fi
+export DYLD_LIBRARY_PATH=$(brew --prefix libomp)/lib:$DYLD_LIBRARY_PATH
 
 . $(brew --prefix)/etc/profile.d/autojump.sh
 # source "$HOME/.wasmedge/env"
 # . "$HOME/.cargo/env"
+
 t ls
