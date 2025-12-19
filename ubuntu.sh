@@ -1,9 +1,4 @@
 #!/bin/bash
-sudo apt install picom rofi i3 i3status i3lock i3-wm i3blocks \
-    i3-wm-icons i3-wm-themes i3-wm-configs i3-wm-scripts i3-wm-utils \
-    i3-wm-libs i3-wm-dev i3-wm-docs i3-wm-examples i3-wm-tutorials i3-wm-faq \
-    i3-wm-troubleshooting i3-wm-tips i3-wm-tricks i3-wm-hacks i3-wm-cheatsheet i3-wm-cheatsheets
-
 set -e  # Exit on error
 
 # Colors for output
@@ -35,13 +30,37 @@ fi
 # Install Homebrew packages
 brew bundle --file ~/.config/Brewfile
 
-# Apply dotfiles from dotfilesUBUNTU
-print_info "Applying configs from dotfilesMACOS..."
-stow dotfilesUBUNTU --dotfiles || {
-    print_error "Failed to apply dotfilesUBUNTU"
-    exit 1
+# Function to detect if system is headless
+is_headless_server() {
+    # Check if DISPLAY is not set or empty
+    if [ -z "$DISPLAY" ]; then
+        return 0  # Headless
+    fi
+    
+    # Check if X server is accessible
+    if ! command -v xset &> /dev/null; then
+        return 0  # Headless (no X utilities)
+    fi
+    
+    # Try to query X server (timeout after 1 second)
+    if ! timeout 1 xset q &> /dev/null; then
+        return 0  # Headless (X server not accessible)
+    fi
+    
+    return 1  # Not headless
 }
-print_info "dotfilesUBUNTU applied successfully"
+
+# Apply dotfiles from dotfilesUBUNTU (skip on headless servers)
+if is_headless_server; then
+    print_warn "Headless server detected. Skipping dotfilesUBUNTU (GUI configs)..."
+else
+    print_info "Applying configs from dotfilesUBUNTU..."
+    stow dotfilesUBUNTU --dotfiles || {
+        print_error "Failed to apply dotfilesUBUNTU"
+        exit 1
+    }
+    print_info "dotfilesUBUNTU applied successfully"
+fi
 
 # Apply dotfiles from dotfilesSHARE
 print_info "Applying configs from dotfilesSHARE..."
