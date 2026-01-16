@@ -1,24 +1,30 @@
-# set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/bin" ] ; then
-    PATH="$HOME/bin:$PATH"
-fi
+# ============================================================================
+# PATH Configuration
+# ============================================================================
 
-# set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/.local/bin" ] ; then
-    PATH="$HOME/.local/bin:$PATH"
-fi
+# Add user's private bin directories to PATH
+[[ -d "$HOME/bin" ]] && PATH="$HOME/bin:$PATH"
+[[ -d "$HOME/.local/bin" ]] && PATH="$HOME/.local/bin:$PATH"
 
-# Homebrew init
+# ============================================================================
+# Homebrew Initialization
+# ============================================================================
+
 if [[ "$OSTYPE" == "darwin"* ]]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
 else
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
 
-# ZSH Prompt config
-# ------------------
+# Cache brew --prefix for performance (expensive command)
+BREW_PREFIX="${HOMEBREW_PREFIX:-$(brew --prefix 2>/dev/null)}"
 
-# Required for vcs_info
+# ============================================================================
+# ZSH Prompt Configuration
+# ============================================================================
+# Custom prompt with Git status indicators using Nerd Font icons
+# Requires: Nerd Font installed and enabled in your terminal
+
 autoload -Uz vcs_info
 setopt PROMPT_SUBST
 
@@ -28,17 +34,15 @@ setopt PROMPT_SUBST
 local folder_icon="" # U+F07C
 local git_icon=""   # U+F126
 
-# --- Git Status Hook ---
-# This custom function will be called by vcs_info. It checks the Git repository's
-# status and assigns a "state" (e.g., clean, dirty, ahead). This state is then
-# used by 'actionformats' to apply different colors and symbols.
+# Git Status Hook Function (optimized with early exits)
+# Checks Git repository status and assigns states (clean, dirty, ahead, behind, diverged)
 +vi-git-action() {
     # Check if a remote tracking branch is configured
     local remote
     remote="$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null)"
 
     # Check for uncommitted changes (staged or unstaged)
-    if ! git diff --quiet --ignore-submodules HEAD; then
+    if ! git diff --quiet --ignore-submodules HEAD 2>/dev/null; then
         # If there are changes, mark state as 'dirty'
         hook_com[action]='dirty'
         return
@@ -52,7 +56,7 @@ local git_icon=""   # U+F126
 
     # Get the count of commits ahead/behind the remote
     local -a ahead_behind
-    ahead_behind=($(git rev-list --left-right --count $remote...HEAD))
+    ahead_behind=($(git rev-list --left-right --count $remote...HEAD 2>/dev/null))
     local behind=${ahead_behind[1]}
     local ahead=${ahead_behind[2]}
 
@@ -64,119 +68,197 @@ local git_icon=""   # U+F126
     elif [[ $behind -gt 0 ]]; then
         hook_com[action]='behind'
     else
-        # If none of the above, the repo is clean relative to the remote
         hook_com[action]='clean'
     fi
 }
 
-# --- VCS Styling ---
-# Add our custom function to the vcs_info 'hooks'
+# VCS Styling Configuration
 zstyle ':vcs_info:git:*' hooks git-action
-
-# Enable checking for staged/unstaged changes. The 'S' and 'U' will appear next to the branch name.
 zstyle ':vcs_info:*' check-for-changes true
-# Adjusted yellow for staged/unstaged changes to a softer tone (e.g., color 3, which is yellow, or a specific hex code if your terminal supports it)
-zstyle ':vcs_info:git:*' stagedstr "%F{#ebdf86} S%f"   # 'S' for Staged - using default yellow for visibility
-zstyle ':vcs_info:git:*' unstagedstr "%F{#ebdf86} U%f" # 'U' for Unstaged - using default yellow for visibility
+zstyle ':vcs_info:git:*' stagedstr "%F{#ebdf86} S%f"   # Staged changes indicator
+zstyle ':vcs_info:git:*' unstagedstr "%F{#ebdf86} U%f" # Unstaged changes indicator
 
-# Define the format for each state. vcs_info will automatically select the
-# correct format based on the 'action' we set in the hook function.
-#
-#   - %b: branch name
-#   - %c: staged changes indicator (from stagedstr)
-#   - %u: unstaged changes indicator (from unstagedstr)
+# Format strings for different Git states
+# %b: branch name, %c: staged changes, %u: unstaged changes
+zstyle ':vcs_info:git:clean:*'    actionformats "%F{#92d4a5}${git_icon} %b%c%u%f"   # Green - clean
+zstyle ':vcs_info:git:dirty:*'    actionformats "%F{#ebdf86}${git_icon} %b%c%u%f"  # Yellow - changes
+zstyle ':vcs_info:git:ahead:*'    actionformats "%F{#66d4f2}${git_icon} %b%c%u ↑%f"  # Cyan - ahead
+zstyle ':vcs_info:git:behind:*'   actionformats "%F{#66d4f2}${git_icon} %b%c%u ↓%f"  # Cyan - behind
+zstyle ':vcs_info:git:diverged:*' actionformats "%F{#f07373}${git_icon} %b%c%u ↕%f"  # Red - diverged
+zstyle ':vcs_info:git:*'          formats "%F{#92d4a5}${git_icon} %b%c%u%f" # Default format
 
-zstyle ':vcs_info:git:clean:*'      actionformats "%F{#92d4a5}${git_icon} %b%c%u%f"   # Using default 'green' (color 2)
-zstyle ':vcs_info:git:dirty:*'      actionformats "%F{#ebdf86}${git_icon} %b%c%u%f"  # Using default 'yellow' (color 3)
-zstyle ':vcs_info:git:ahead:*'      actionformats "%F{#66d4f2}${git_icon} %b%c%u ↑%f"  # Using default 'cyan' (color 6)
-zstyle ':vcs_info:git:behind:*'     actionformats "%F{#66d4f2}${git_icon} %b%c%u ↓%f"  # Using default 'cyan' (color 6)
-zstyle ':vcs_info:git:diverged:*'   actionformats "%F{#f07373}${git_icon} %b%c%u ↕%f"    # Using default 'red' (color 1)
-
-# Fallback format if no remote is configured
-zstyle ':vcs_info:git:*' formats "%F{#92d4a5}${git_icon} %b%c%u%f" # Using default 'green' (color 2)
-
-# --- Prompt Assembly ---
-# The precmd function is executed before each prompt is displayed.
+# Prompt assembly - executed before each prompt display
 precmd() {
     vcs_info
 }
 
-# The final PROMPT string.
-#   - %F{color}: Sets the foreground color
-#   - %f: Resets the foreground color
-#   - ${folder_icon}: Displays the folder icon.
-#   - %~: Displays the path, with ~ for the home directory.
-#   - ${vcs_info_msg_0_}: This is where our styled Git information will be inserted.
-#   - \n: Creates a new line.
-#   - └─: The "curve" indicator.
-#   - %F{#92d4a5}❯%f: Green arrow indicator.
-#   - %_: Moves the cursor to the next line for user input (after the arrow and space).
+# Final prompt string
+# Format: [folder icon] [path] [git info]
+#         [green arrow prompt]
 PROMPT='%F{#fcd860}${folder_icon} %~%f ${vcs_info_msg_0_}
 %F{#92d4a5}❯%f '
 
-# source zsh plugin
-source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source $(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
-ZVM_VI_INSERT_ESCAPE_BINDKEY=jk
+# ============================================================================
+# History Configuration
+# ============================================================================
 
-# vi
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt HIST_IGNORE_ALL_DUPS  # Remove older duplicate entries from history
+setopt HIST_REDUCE_BLANKS     # Remove superfluous blanks from history items
+setopt INC_APPEND_HISTORY     # Append to history immediately
+setopt SHARE_HISTORY          # Share history between sessions
+
+# ============================================================================
+# Completion System (Optimized with Cache)
+# ============================================================================
+
+# Only regenerate compinit cache once per day for faster startup
+autoload -Uz compinit
+if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
+    compinit
+else
+    compinit -C
+fi
+
+# ============================================================================
+# ZSH Plugins (Loaded with Cached Brew Prefix)
+# ============================================================================
+
+# Load plugins with error handling
+_load_plugin() {
+    local plugin_path="$1"
+    [[ -f "$plugin_path" ]] && source "$plugin_path"
+}
+
+if [[ -n "$BREW_PREFIX" ]]; then
+    _load_plugin "${BREW_PREFIX}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+    _load_plugin "${BREW_PREFIX}/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    _load_plugin "${BREW_PREFIX}/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh"
+fi
+
+# ============================================================================
+# Key Bindings & Editor Settings
+# ============================================================================
+
+# Enable vi mode
 bindkey -v
 
-# # Lines configured by zsh-newuser-install
-# HISTFILE=~/.histfile
-# HISTSIZE=1000
-# SAVEHIST=1000
+# Vi-mode escape key binding (jk to escape insert mode)
+ZVM_VI_INSERT_ESCAPE_BINDKEY=jk
 
+# ============================================================================
+# Aliases
+# ============================================================================
 
-# # End of lines configured by zsh-newuser-install
-# # The following lines were added by compinstall
-# zstyle :compinstall filename '$HOME/.zshrc'
-
-# autoload -Uz compinit
-# compinit
-# # End of lines added by compinstall
-
-# Alias
+# Enhanced ls with lsd
 alias ls='lsd -F --group-directories-first'
-alias la='ls -AF --group-directories-first'
+alias la='lsd -AF --group-directories-first'
+alias ll='lsd -lF --group-directories-first'
+alias lla='lsd -lAF --group-directories-first'
+
+# Tool replacements
 alias man='tldr'
 alias lg='lazygit'
 alias ld='lazydocker'
 
-# >>> conda initialize >>>
+# ============================================================================
+# Conda Initialization
+# ============================================================================
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('$HOME/miniforge3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "$HOME/miniforge3/etc/profile.d/conda.sh" ]; then
-        . "$HOME/miniforge3/etc/profile.d/conda.sh"
-    else
-        export PATH="$HOME/miniforge3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
+# __conda_setup="$('$HOME/miniforge3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+# if [ $? -eq 0 ]; then
+#     eval "$__conda_setup"
+# else
+#     if [ -f "$HOME/miniforge3/etc/profile.d/conda.sh" ]; then
+#         . "$HOME/miniforge3/etc/profile.d/conda.sh"
+#     else
+#         export PATH="$HOME/miniforge3/bin:$PATH"
+#     fi
+# fi
+# unset __conda_setup
+# # <<< conda initialize <<<
 
-# OpenAI Key
-export OPENAI_API_KEY=$(cat "$HOME/Documents/key.txt")
+# # OpenAI API Key (load from file if it exists)
+# if [[ -f "$HOME/Documents/key.txt" ]]; then
+#     export OPENAI_API_KEY=$(cat "$HOME/Documents/key.txt" 2>/dev/null)
+# fi
+
+# ============================================================================
+# OS-Specific Configuration
+# ============================================================================
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-
-    # mujoco-py installation
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/.mujoco/mujoco210/bin
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia
-
-    ROS_DIR=$(ls /opt/ros | sort -Vr | head -n 1)
-    source /opt/ros/$ROS_DIR/setup.zsh
+    # MuJoCo library path
+    [[ -d "$HOME/.mujoco/mujoco210/bin" ]] && \
+        export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/.mujoco/mujoco210/bin"
+    
+    # CUDA paths
+    if [[ -d "/usr/local/cuda-12.8" ]]; then
+        export PATH="/usr/local/cuda-12.8/bin${PATH:+:${PATH}}"
+        export LD_LIBRARY_PATH="/usr/local/cuda-12.8/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"
+    fi
+    
+    # ROS setup (cached - only check once)
+    if [[ -d "/opt/ros" && -z "$ROS_DISTRO" ]]; then
+        # Use a simpler, faster method to find the latest ROS version
+        for ros_dir in /opt/ros/*/setup.zsh(N); do
+            source "$ros_dir"
+            break
+        done
+    fi
 
     # naoqi SDK
     # export PYTHONPATH="/home/shi00317/project/nao/nao_chat/nao_docker/naoqi_choregraphe/naoqi_SDK/pynaoqi-python2.7-2.8.6.23-linux64-20191127_152327/lib/python2.7/site-packages:$PYTHONPATH"
     # export QI_SDK_PREFIX="/home/shi00317/project/nao/nao_chat/nao_docker/naoqi_choregraphe/naoqi_SDK/pynaoqi-python2.7-2.8.6.23-linux64-20191127_152327:$QI_SDK_PREFIX"
     # export LD_LIBRARY_PATH="/home/shi00317/project/nao/nao_chat/nao_docker/naoqi_choregraphe/naoqi_SDK/pynaoqi-python2.7-2.8.6.23-linux64-20191127_152327:$LD_LIBRARY_PATH"
-
 fi
-export DYLD_LIBRARY_PATH=$(brew --prefix libomp)/lib:$DYLD_LIBRARY_PATH
 
-. $(brew --prefix)/etc/profile.d/autojump.sh
+# macOS: libomp library path (use cached brew prefix)
+if [[ "$OSTYPE" == "darwin"* && -n "$BREW_PREFIX" ]]; then
+    export DYLD_LIBRARY_PATH="${BREW_PREFIX}/opt/libomp/lib:$DYLD_LIBRARY_PATH"
+fi
+
+# ============================================================================
+# Additional Tools
+# ============================================================================
+
+# Autojump - fast directory navigation (use cached brew prefix)
+if [[ -n "$BREW_PREFIX" && -f "${BREW_PREFIX}/etc/profile.d/autojump.sh" ]]; then
+    source "${BREW_PREFIX}/etc/profile.d/autojump.sh"
+fi
+
+# ============================================================================
+# Lazy-Load Conda (Only activate when needed)
+# ============================================================================
+# This significantly improves startup time by only loading conda when you use it
+
+# Lazy conda initialization function
+_lazy_conda_init() {
+    unset -f conda  # Remove this temporary function
+    
+    # !! Contents within this block are managed by 'conda init' !!
+    __conda_setup="$('$HOME/miniforge3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+    if [ $? -eq 0 ]; then
+        eval "$__conda_setup"
+    else
+        if [ -f "$HOME/miniforge3/etc/profile.d/conda.sh" ]; then
+            . "$HOME/miniforge3/etc/profile.d/conda.sh"
+        else
+            export PATH="$HOME/miniforge3/bin:$PATH"
+        fi
+    fi
+    unset __conda_setup
+    # <<< conda initialize <<<
+    
+    # Now run the actual conda command that was called
+    conda "$@"
+}
+
+# Create a temporary conda function that triggers the real initialization
+if [[ -f "$HOME/miniforge3/bin/conda" ]]; then
+    conda() {
+        _lazy_conda_init "$@"
+    }
+fi

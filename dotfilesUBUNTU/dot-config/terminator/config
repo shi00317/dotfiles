@@ -2,14 +2,14 @@
   window_state = hidden
   borderless = True
   title_use_system_font = False
-  title_font = JetBrainsMonoNL Nerd Font Semi-Bold 13
+  title_font = JetBrainsMonoNL Nerd Font Semi-Bold 15
 [keybindings]
 [profiles]
   [[default]]
     background_darkness = 0.86
     background_type = transparent
     cursor_color = "#aaaaaa"
-    font = JetBrainsMonoNL Nerd Font Mono 10
+    font = JetBrainsMonoNL Nerd Font Mono 13
     show_titlebar = False
     use_system_font = False
 [layouts]
