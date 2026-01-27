@@ -196,8 +196,9 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     
     # CUDA paths
     if [[ -d "/usr/local/cuda-12.8" ]]; then
-        export PATH="/usr/local/cuda-12.8/bin${PATH:+:${PATH}}"
-        export LD_LIBRARY_PATH="/usr/local/cuda-12.8/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"
+        export CUDA_HOME="/usr/local/cuda-12.8"
+        export PATH="${CUDA_HOME}/bin${PATH:+:${PATH}}"
+        export LD_LIBRARY_PATH="${CUDA_HOME}/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"
     fi
     
     # ROS setup (cached - only check once)
