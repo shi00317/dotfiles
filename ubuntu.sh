@@ -27,9 +27,6 @@ if ! command -v brew &> /dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-# Install Homebrew packages
-brew bundle --file ~/.config/Brewfile
-
 # Function to detect if system is headless
 is_headless_server() {
     # Check if DISPLAY is not set or empty
@@ -61,6 +58,11 @@ else
     }
     print_info "dotfilesUBUNTU applied successfully"
 fi
+
+
+# Install Homebrew packages
+brew bundle --file ~/.config/Brewfile
+
 
 # Apply dotfiles from dotfilesSHARE
 print_info "Applying configs from dotfilesSHARE..."

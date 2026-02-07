@@ -1,16 +1,14 @@
 # Taps
-tap "homebrew/cask-fonts"
+# tap "homebrew/cask-fonts"
 
 # Formulae
 brew "lsd"
-brew "git"
 brew "git-lfs"
 brew "lazygit"
 brew "lazydocker"
 brew "autojump"
 brew "ffmpeg"
 brew "htop"
-brew "stow"
 brew "tmux"
 brew "tldr"
 brew "zsh-autosuggestions"
@@ -30,5 +28,5 @@ brew "uv"
 
 
 # Casks
-cask "font-jetbrains-mono-nerd-font"
-cask "visual-studio-code"
+# cask "font-jetbrains-mono-nerd-font"
+# cask "visual-studio-code"
