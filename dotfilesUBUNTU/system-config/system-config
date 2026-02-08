@@ -1,0 +1,3 @@
+[/]
+activate-window-menu=@as []
+close=['<Super>q']
