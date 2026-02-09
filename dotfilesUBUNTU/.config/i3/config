@@ -5,6 +5,9 @@ exec_always --no-startup-id ~/.config/i3/detect_monitors.sh
 # Import the monitor variables ($main and $side)
 include ~/.config/i3/monitors.conf
 
+# Monitor hotplug detection - runs in background to detect monitor changes
+exec_always --no-startup-id pkill -f "monitor_watcher.sh"; ~/.config/i3/monitor_watcher.sh &
+
 # --- VARIABLES ---
 set $mod Mod4
 font pango:JetBrainsMono Nerd Font 11
@@ -15,6 +18,12 @@ bindsym $mod+Shift+q kill
 bindsym $mod+d exec --no-startup-id rofi -show drun -show-icons
 bindsym $mod+p exec --no-startup-id ~/.config/i3/display_selector.sh
 bindsym $mod+shift+x exec i3lock
+
+# Volume (keyboard media keys)
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +5%
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -5%
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle
+bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle
 
 # Drag floating windows
 floating_modifier $mod
@@ -53,6 +62,8 @@ workspace $ws8 output $side
 workspace $ws9 output $side
 
 # Switch
+bindsym $mod+Tab workspace back_and_forth
+bindsym $mod+b workspace back_and_forth
 bindsym $mod+1 workspace $ws1
 bindsym $mod+2 workspace $ws2
 bindsym $mod+3 workspace $ws3
@@ -83,9 +94,12 @@ assign [class="Alacritty|Gnome-terminal|XTerm"] $wsT
 assign [class="Code|code-oss|Cursor"] $wsW
 
 # --- VISUALS ---
-gaps inner 10
+gaps inner 5
 gaps outer 0
-default_border pixel 2
+# Ensure all windows have borders
+default_border pixel 3
+default_floating_border pixel 3
+for_window [class=".*"] border pixel 3
 
 # Colors                Border  Backgr. Text    Indicator Child_Border
 client.focused          #bd93f9 #bd93f9 #282a36 #bd93f9   #bd93f9
@@ -99,14 +113,13 @@ exec_always --no-startup-id xrdb -merge ~/.Xresources
 # 2. Compositor (Transparency/Smoothness)
 exec_always --no-startup-id picom -b
 # 3. Wallpaper
-exec_always --no-startup-id feh --bg-scale /usr/share/backgrounds/warty-final-ubuntu.png
+# Use --bg-fill so the image fills each monitor properly
+exec_always --no-startup-id feh --bg-fill /usr/share/backgrounds/warty-final-ubuntu.png
 # 4. Polybar
 exec_always --no-startup-id ~/.config/polybar/launch.sh
 # 5. Network Applet
 exec --no-startup-id nm-applet
 # 6. Autorandr (Check room location)
 exec --no-startup-id autorandr --change
-# 7. Set the laptop trackpad tap as click
-exec_always xinput set-prop "Device Name" "libinput Tapping Enabled" 1
-# 8. Set the laptop trackpad natural scrolling
-exec_always xinput set-prop "Your Device Name" "libinput Natural Scrolling Enabled" 1
+# 7. Set the laptop trackpad tap-as-click and natural scrolling (auto-detect touchpad)
+exec_always --no-startup-id sh -c 'id=$(xinput list | grep -i touchpad | head -1 | sed -n "s/.*id=\\([0-9]*\\).*/\1/p"); [ -n "$id" ] && xinput set-prop "$id" "libinput Tapping Enabled" 1 && xinput set-prop "$id" "libinput Natural Scrolling Enabled" 0'
