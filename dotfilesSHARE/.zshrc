@@ -263,3 +263,8 @@ if [[ -f "$HOME/miniforge3/bin/conda" ]]; then
         _lazy_conda_init "$@"
     }
 fi
+
+# Kitty terminal, if using Kitty then use the alias ssh for kitty +kitten ssh
+if [ "$TERM" = "xterm-kitty" ]; then
+    alias s='kitty +kitten ssh'
+fi

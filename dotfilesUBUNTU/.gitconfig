@@ -12,3 +12,5 @@
 	defaultBranch = main
 [core]
 	excludesfile = ~/.gitignore_global
+[credential]
+	helper = store
