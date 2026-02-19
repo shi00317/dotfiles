@@ -163,6 +163,37 @@ alias man='tldr'
 alias lg='lazygit'
 alias ld='lazydocker'
 
+# General
+alias g="git"
+alias gs="git status"
+alias ga="git add"
+alias gaa="git add --all"
+alias gc="git commit -m"
+alias gca="git commit --amend --no-edit"
+
+# Branching & Merging
+alias gb="git branch"
+alias gco="git checkout"
+alias gcb="git checkout -b"
+alias gm="git merge"
+
+# Pull/Push
+alias gl="git pull"
+alias gp="git push"
+alias gpf="git push --force-with-lease"
+
+# Logging (The "Pretty" Log)
+alias glo="git log --oneline --graph --decorate"
+
+alias v="nvim"
+alias vi="nvim"
+alias vim="nvim"
+
+# Quickly edit your config files
+alias vrc="nvim ~/.zshrc"
+alias vconf="nvim ~/.config/nvim/"
+
+alias y="yazi"
 # ============================================================================
 # Conda Initialization
 # ============================================================================
